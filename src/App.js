@@ -15,18 +15,58 @@ class App extends Component {
       { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
     ],
     filter: "",
-    name: "",
-    number: "",
+  };
+
+  // contacts
+  addContact = (text, value) => {
+    console.log(text);
+    console.log(value);
+    const newContact = { id: uuidv4(), name: text, number: value };
+    if (
+      this.state.contacts
+        .map((contact) => contact.name.toLowerCase())
+        .includes(text.toLowerCase())
+    ) {
+      return alert(`Contact "${text}" already exists`);
+    }
+    this.setState((prevState) => ({
+      contacts: [newContact, ...prevState.contacts],
+    }));
+  };
+
+  deleteContact = (contactId) => {
+    this.setState((prevState) => ({
+      contacts: prevState.contacts.filter(
+        (contact) => contact.id !== contactId
+      ),
+    }));
+  };
+
+  // filter
+  changeFilter = (event) => {
+    this.setState({ filter: event.target.value });
+  };
+
+  getVisibleContacts = () => {
+    const normalizedFilter = this.state.filter.toLowerCase();
+    return this.state.contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
   };
 
   render() {
+    const filterContacts = this.getVisibleContacts();
     return (
       <div className="App">
         <h1>Phonebook</h1>
-        <ContactForm />
+        <ContactForm onSubmit={this.addContact} />
         <h2>Contacts</h2>
-        <Filter />
-        <ContactList />
+        <Filter filter={this.state.filter} onChange={this.changeFilter} />
+        <ContactList
+          contacts={filterContacts}
+          // contacts={this.state.contacts}
+          deleteContact={this.deleteContact}
+        />
       </div>
     );
   }
